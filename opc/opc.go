@@ -92,22 +92,22 @@ func CopyFile(src, des string) (err error) {
 
 //OpcdaForm struct
 type OpcdaForm struct {
-	Module             string `form:"module" binding:"required"`
-	MainServerIP       string `form:"main_server_ip" binding:"required"`
-	MainServerPrgid    string `form:"main_server_prgid" binding:"required"`
-	MainServerClsid    string `form:"main_server_clsid" binding:"required"`
-	MainServerDomain   string `form:"main_server_domain" binding:"required"`
-	MainServerUser     string `form:"main_server_user" binding:"required"`
-	MainServerPassword string `form:"main_server_password" binding:"required"`
-	BakServerIP        string `form:"bak_server_ip" binding:"required"`
-	BakServerPrgid     string `form:"bak_server_prgid" binding:"required"`
-	BakServerClsid     string `form:"bak_server_clsid" binding:"required"`
-	BakServerDomain    string `form:"bak_server_domain" binding:"required"`
-	BakServerUser      string `form:"bak_server_user" binding:"required"`
-	BakServerPassword  string `form:"bak_server_password" binding:"required"`
+	Module             string `form:"module" binding:"required" json:"Module"`
+	MainServerIP       string `form:"main_server_ip" binding:"required" json:"main_server_ip" `
+	MainServerPrgid    string `form:"main_server_prgid" binding:"required" json:"main_server_prgid"`
+	MainServerClsid    string `form:"main_server_clsid" binding:"required" json:"main_server_clsid"`
+	MainServerDomain   string `form:"main_server_domain" binding:"required" json:"main_server_domain"`
+	MainServerUser     string `form:"main_server_user" binding:"required" json:"main_server_user"`
+	MainServerPassword string `form:"main_server_password" binding:"required"  json:"main_server_password"`
+	BakServerIP        string `form:"bak_server_ip" binding:"required" json:"bak_server_ip"`
+	BakServerPrgid     string `form:"bak_server_prgid" binding:"required" json:"bak_server_prgid"`
+	BakServerClsid     string `form:"bak_server_clsid" binding:"required" json:"bak_server_clsid"`
+	BakServerDomain    string `form:"bak_server_domain" binding:"required" json:"bak_server_domain"`
+	BakServerUser      string `form:"bak_server_user" binding:"required" json:"bak_server_user"`
+	BakServerPassword  string `form:"bak_server_password" binding:"required" json:"bak_server_password"`
 }
 
-//Opcdaget config get
+//Opcdaget return opc da config page
 func Opcdaget(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "da.html", gin.H{
@@ -116,7 +116,7 @@ func Opcdaget(c *gin.Context) {
 
 }
 
-//Opcdapost post
+//Opcdapost handle post
 func Opcdapost(c *gin.Context) {
 	var form OpcdaForm
 	if c.ShouldBind(&form) == nil {
@@ -153,25 +153,9 @@ func Opcdapost(c *gin.Context) {
 			outputWriter.WriteString(outputString)
 		}
 		outputWriter.Flush()
-		WriteFile(form)
 		// WriteExcel()
-		ReadExcel()
+		ReadExcel(form)
 	}
-}
-
-//RE GG
-func RE(excelPath string) []string {
-	xlsx, err := excelize.OpenFile(excelPath)
-	if err != nil {
-		fmt.Println("open excel error,", err.Error())
-		os.Exit(1)
-	}
-	rows := xlsx.GetRows(xlsx.GetSheetName(xlsx.GetActiveSheetIndex()))
-	result := make([]string, 0)
-	for _, row := range rows {
-		result = append(result, row[0])
-	}
-	return result
 }
 
 type tags struct {
@@ -188,26 +172,23 @@ type groups struct {
 	Tags         []tags `json:"tags"`
 }
 
-// var ts = map[string]interface{}{
-// 	"tag_id":           0,
-// 	"publish_tag_name": "",
-// 	"source_tag_name":  "",
-// 	"data_type":        "模拟量",
-// }
-// var gs = map[string]interface{}{
-// 	"group_id":      0,
-// 	"group_name":    "",
-// 	"collect_cycle": 15,
-// 	"tags":          make([]map[string]interface{}, 10, 10),
-// }
+//Gslist GROUPS
+type Gslist struct {
+	GroupList []groups `json:"groups"`
+}
+
+//Da opc da config struct
+type Da struct {
+	OpcdaForm
+	Gslist
+}
 
 var ts tags
 var gs groups
+var gl Gslist
 
-var gslist []interface{}
-
-// ReadExcel DEMO
-func ReadExcel() {
+// ReadExcel read tag from excel
+func ReadExcel(form OpcdaForm) {
 	f, err := excelize.OpenFile("./upload/opc.xlsx")
 	if err != nil {
 		fmt.Println(err)
@@ -229,10 +210,9 @@ func ReadExcel() {
 	// fmt.Println(name)
 	m := f.GetSheetMap()
 	var s []int
-	for key, _ := range m {
+	for key := range m {
 		s = append(s, key)
 	}
-
 	sort.Ints(s)
 	var i = 0
 	for _, v := range s {
@@ -242,6 +222,7 @@ func ReadExcel() {
 		gs.GroupName = s[0]
 		gs.GroupID, _ = strconv.Atoi(s[0][len(s[0])-1:])
 		gs.CollectCycle, _ = strconv.Atoi(s[1])
+		tmp := []tags{}
 		for _, row := range rows[1:] {
 			for _, colCell := range row[:1] {
 				// fmt.Println(colCell)
@@ -250,18 +231,27 @@ func ReadExcel() {
 				ts.DataType = "ENUM_INT32"
 				ts.TagID = i
 			}
-			gs.Tags = append(gs.Tags, ts)
+			tmp = append(tmp, ts)
+			// gs.Tags=tmp
+			gs.Tags = make([]tags, len(tmp), cap(tmp))
+			copy(gs.Tags, tmp)
 			i++
 		}
 
-		gslist = append(gslist, gs)
+		gl.GroupList = append(gl.GroupList, gs)
+
 	}
-	// b, _ := json.Marshal(gslist)
+	// fmt.Println(form, gl)
+	// b, _ := json.Marshal(GroupList)
 	// fmt.Println(string(b))
-	WriteFile(gslist)
+	dajson := Da{
+		form,
+		gl,
+	}
+	WriteFile(dajson)
 }
 
-// WriteExcel dd
+// WriteExcel write data to excel
 func WriteExcel() {
 	f := excelize.NewFile()
 	// Create a new sheet.

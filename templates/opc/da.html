@@ -1,0 +1,285 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>opc da client</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link href="/static/css/signin.css" rel="stylesheet">
+
+    <script src="/static/js/jquery-3.5.1.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/alerts.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="col-12" id='content'>
+            <div class="align-middle col-12  mb-2 row">
+                <h5 class="h2 d-inline">
+                    <span class="text-muted ">opc client参数配置</span>
+                </h5>
+            </div>
+            <hr class="border-bottom border-danger" />
+            <form action="/dapost" method="post" id='shen' enctype="multipart/form-data" class="needs-validation" novalidate>
+                <fieldset disabled id='bj'>
+                    <div class="form-group row">
+                        <label for="module" class="col-sm-3 col-form-label col-form-label-md">module_name</label>
+                        <div class="col-sm-4">
+                            <select class="form-control form-control-md custom-select " name='module' id="module"
+                                required>
+                                <option>s_opcda_client1</option>
+                                <option>s_opcda_client2</option>
+                                <option>s_opcda_client3</option>
+                            </select>
+                            <div class="invalid-feedback" style="width: 100%;">
+                                Your username is required.
+                            </div>
+                        </div>
+                        <label for="module" class="col-sm-3 col-form-label col-form-label-md">模块名称</label>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="main_server_ip"
+                            class="col-sm-3 col-form-label col-form-label-md">Main_OPC_Server_IP_Address</label>
+                        <div class="col-sm-4">
+                            <input type="text" name='main_server_ip' class="form-control form-control-md"
+                                id="main_server_ip" placeholder="Enter OPC Server IP address" style="width: 100%"
+                                required value="192.168.31.17">
+                        </div>
+                        <label for="main_server_ip" class="col-sm-3 col-form-label col-form-label-md">opc服务器地址</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="main_server_prgid"
+                            class="col-sm-3 col-form-label col-form-label-md">Main_OPC_Server_ProgID</label>
+                        <div class="col-sm-4">
+                            <select class="form-control form-control-md custom-select" name='main_server_prgid'
+                                id="main_server_prgid" required>
+                                <option>Intellution.OPCiFIX.1</option>
+                                <option>Kepware.KEPServerEX.V6</option>
+                                <option>Yokogawa.CSHIS_OPC.1</option>
+                                <option>SUPCON.SCRTCore.1</option>
+                                <option>OPCSystems.NET.1</option>
+                            </select>
+                        </div>
+                        <label for="main_server_prgid"
+                            class="col-sm-3 col-form-label col-form-label-md">请选择opc名称</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="main_server_clsid"
+                            class="col-sm-3 col-form-label col-form-label-md">Main_OPC_Server_classID</label>
+                        <div class="col-sm-4">
+                            <select class="form-control form-control-md custom-select" name='main_server_clsid'
+                                id="main_server_clsid" required>
+                                <option>3C5702A2-EB8E-11D4-83A4-00105A984CBD</option>
+                                <option>7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729</option>
+                                <option>E6C32641-F1CF-11D0-B0E4-080009CCD384</option>
+                                <option>41EBD53D-36C4-4027-B2B4-09A6E4A362DD</option>
+                                <option>6031BF75-9CF2-11D1-A97B-00C04FC01389</option>
+                                <option>32FB9E42-29D6-4841-9218-9DA5E1515623</option>
+                            </select>
+                        </div>
+                        <label for="main_server_clsid"
+                            class="col-sm-3 col-form-label col-form-label-md">请选择classid名称</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="main_server_domain"
+                            class="col-sm-3 col-form-label col-form-label-md">Main_OPC_Server_Domain</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="main_server_domain" class="form-control form-control-md"
+                                id="main_server_domain" placeholder="OPC login name" value="kepware6.5">
+                        </div>
+                        <label for="main_server_domain" class="col-sm-3 col-form-label col-form-label-md">请输入域名</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="main_server_user"
+                            class="col-sm-3 col-form-label col-form-label-md">Main_OPC_Server_Username</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="main_server_user" class="form-control form-control-md"
+                                id="main_server_user" placeholder="domain" required value="administrator">
+                        </div>
+                        <label for="main_server_user" class="col-sm-3 col-form-label col-form-label-md">请输入用户名</label>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="main_server_password"
+                            class="col-sm-3 col-form-label col-form-label-md">Main_OPC_Server_Password</label>
+                        <div class="col-sm-4">
+                            <input type="password" name="main_server_password" class="form-control form-control-md"
+                                id="main_server_password" placeholder="OPC login password" required value="111111">
+                        </div>
+                        <label for="main_server_password"
+                            class="col-sm-3 col-form-label col-form-label-md">请输入密码</label>
+                    </div>
+                    <!--备用 OPC配置  -->
+                    <div class="form-group row">
+                        <label for="bak_server_ip"
+                            class="col-sm-3 col-form-label col-form-label-md">Back_OPC_Server_IP_Address</label>
+                        <div class="col-sm-4">
+                            <input type="text" name='bak_server_ip' class="form-control form-control-md"
+                                id="bak_server_ip" placeholder="Enter OPC Server IP address" style="width: 100%"
+                                required value="192.168.31.18">
+                        </div>
+                        <label for="bak_server_ip" class="col-sm-3 col-form-label col-form-label-md">这里请填写OPC地址</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bak_server_prgid"
+                            class="col-sm-3 col-form-label col-form-label-md">Back_OPC_Server_ProgID</label>
+                        <div class="col-sm-4">
+                            <select class="form-control form-control-md custom-select" name="bak_server_prgid"
+                                id="bak_server_prgid" required>
+                                <option>Intellution.OPCiFIX.1</option>
+                                <option>Kepware.KEPServerEX.V6</option>
+                                <option>Yokogawa.CSHIS_OPC.1</option>
+                                <option>SUPCON.SCRTCore.1</option>
+                                <option>OPCSystems.NET.1</option>
+                            </select>
+                        </div>
+                        <label for="bak_server_prgid" class="col-sm-3 col-form-label col-form-label-md">请选择opc名称</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bak_server_clsid"
+                            class="col-sm-3 col-form-label col-form-label-md">Back_OPC_Server_classID</label>
+                        <div class="col-sm-4">
+                            <select class="form-control form-control-md custom-select " name='bak_server_clsid'
+                                id="bak_server_clsid" required>
+                                <option>3C5702A2-EB8E-11D4-83A4-00105A984CBD</option>
+                                <option>7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729</option>
+                                <option>E6C32641-F1CF-11D0-B0E4-080009CCD384</option>
+                                <option>41EBD53D-36C4-4027-B2B4-09A6E4A362DD</option>
+                                <option>6031BF75-9CF2-11D1-A97B-00C04FC01389</option>
+                            </select>
+                        </div>
+                        <label for="bak_server_clsid"
+                            class="col-sm-3 col-form-label col-form-label-md">请选择classid名称</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bak_server_domain"
+                            class="col-sm-3 col-form-label col-form-label-md">Back_OPC_Server_Domain</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="bak_server_domain" class="form-control form-control-md"
+                                id="bak_server_domain" placeholder="domain" value="ifix5.5">
+                        </div>
+                        <label for="bak_server_domain" class="col-sm-3 col-form-label col-form-label-md">请输入域名</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bak_server_user"
+                            class="col-sm-3 col-form-label col-form-label-md">Back_OPC_Server_Username</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="bak_server_user" class="form-control form-control-md"
+                                id="bak_server_user" placeholder="OPC login name" required value="administrator">
+                        </div>
+                        <label for="bak_server_user" class="col-sm-3 col-form-label col-form-label-md">请输入用户名</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bak_server_password"
+                            class="col-sm-3 col-form-label col-form-label-md">Back_OPC_Server_Password</label>
+                        <div class="col-sm-4">
+                            <input type="password" name="bak_server_password" class="form-control form-control-md"
+                                id="bak_server_password" placeholder="OPC login password" required value="111111">
+                        </div>
+                        <label for="bak_server_password" class="col-sm-3 col-form-label col-form-label-md">请输入密码</label>
+                    </div>
+                    <div class="form-group row">
+                        <label for="file" class="col-sm-2 col-form-label col-form-label-md">上传位号:</label>
+                        <div class="col-sm-4 offset-1">
+                            <input type="file" name='file' class="form-control form-control-md" id="file">
+                        </div>
+                        <label for="file" class="col-sm-3 col-form-label col-form-label-md">请选择excel上传</label>
+                    </div>
+
+                </fieldset>
+                <div class="form-group row">
+                    <div class="col-sm-4  offset-3">
+                        <button type="button" class="btn btn-info btn-block btn-md" id='alter'
+                            onclick="edit()">edit</button>
+                        <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
+                            onclick="save()">save</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
+    </div>
+</body>
+<script>
+    function edit() {
+        var module_name = $("#module").val()
+        alarms('开始编辑' + module_name)
+        $("#alter").addClass("d-none");
+        $("#comm1").removeClass("d-none");
+        $("#bj").removeAttr("disabled");;
+
+    }
+
+    function save() {
+        $("#alter").removeClass("d-none");
+        $("#comm1").addClass("d-none");
+        $("#bj").addAttr("disabled");
+    }
+
+
+    $(document).ready(function () {
+
+        $("#alter").click(function () {
+            var module_name = $("#module").val()
+            $.ajax({
+                url: "/da",
+                data: {
+                    'module': module_name
+                },
+                type: 'get',
+                dataType: 'json',
+                success: success,
+                error: function (data) {
+                    console.log("请填写完全");
+                },
+            });
+            return false;
+        });
+    })
+
+    function success(data) {
+        console.log(data.basic_config)
+        $('#main_server_ip').val(data.basic_config.main_server_ip)
+        $('#main_server_prgid').val(data.basic_config.main_server_prgid)
+        $('#main_server_clsid').val(data.basic_config.main_server_clsid)
+        $('#main_server_domain').val(data.basic_config.main_server_domain)
+        $('#main_server_user').val(data.basic_config.main_server_user)
+        $('#main_server_password').val(data.basic_config.main_server_password)
+        $('#bak_server_ip').val(data.basic_config.bak_server_ip)
+        $('#bak_server_prgid').val(data.basic_config.bak_server_prgid)
+        $('#bak_server_clsid').val(data.basic_config.bak_server_clsid)
+        $('#bak_server_domain').val(data.basic_config.bak_server_domain)
+        $('#bak_server_user').val(data.basic_config.bak_server_user)
+        $('#bak_server_password').val(data.basic_config.bak_server_password)
+    }
+
+    (function () {
+        'use strict'
+
+        window.addEventListener('load',
+            function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation')
+
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(
+                    forms,
+                    function (form) {
+                        form.addEventListener('submit',
+                            function (event) {
+                                if (form.checkValidity() === false) {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }
+                                form.classList.add('was-validated')
+                            }, false)
+                    })
+            }, false)
+    }())
+</script>
+</html>

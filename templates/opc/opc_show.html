@@ -1,0 +1,188 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{.title}}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link href="/static/css/signin.css" rel="stylesheet">
+
+    <script src="/static/js/jquery-3.5.1.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/alerts.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="align-middle col-12  mb-2">
+                <h4 class="h2 d-inline">
+                    <span class="text-muted ">参数配置预览</span>
+                </h4>
+                <hr class="border-bottom border-danger" />
+            </div>
+            <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
+                <h5>请选择模块:</h5>
+            </label>
+
+            <div class="col-auto">
+                <select class="form-control form-control-md " name='module' id="module">
+                    <option>s_opcda_server1</option>
+                    <option>s_opcda_server2</option>
+                    <option>s_opcda_server3</option>
+                    <option>s_opcda_client1</option>
+                    <option>s_opcda_client2</option>
+                    <option>s_opcda_client3</option>
+                    <option>s_opcae_client1</option>
+                    <option>s_opcae_client2</option>
+                    <option>s_opcae_client3</option>
+                    <option>modbus1</option>
+                    <option>modbus2</option>
+
+                </select>
+            </div>
+            <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
+                onclick="opc_show()">
+                show me
+            </button>
+            <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
+                onclick="get_config()">
+                s_config
+            </button>
+            <a href="" class="col-sm-1 form-control form-control-md btn btn-outline-primary">
+                修改配置
+            </a>
+
+
+            <div class="col-12">
+                <div class="row m-0 p-0">
+                    <div class="col-5 m-0 p-0">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">配置名称</th>
+                                    <th scope="col">配置值</th>
+                                </tr>
+                            </thead>
+                            <tbody id='opc_da_config'>
+                                {{ range $k , $v := . }}
+                                <tr>
+                                    <td>
+                                        {{ $k }}
+                                    </td>
+                                    <td>
+                                        {{ $v }}
+                                    </td>
+                                </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 配置说明 -->
+                    <div class="col-2 p-0 m-0">
+                        <table class="table table-bordered table-hover">
+                            <th>配置说明</th>
+                            <tr>
+                                <td>主opc服务器ip地址</td>
+                            </tr>
+                            <tr>
+                                <td>主opc名称</td>
+                            </tr>
+                            <tr>
+                                <td>主opc classid</td>
+                            </tr>
+                            <tr>
+                                <td>主机域名：计算机名</td>
+                            </tr>
+                            <tr>
+                                <td>主opc登录账户</td>
+                            </tr>
+                            <tr>
+                                <td>主opc登录密码</td>
+                            </tr>
+                            <tr>
+                                <td>备opc服务器ip地址</td>
+                            </tr>
+                            <tr>
+                                <td>备opc名称</td>
+                            </tr>
+                            <tr>
+                                <td>备opc classid</td>
+                            </tr>
+                            <tr>
+                                <td>备机器域名:计算机名</td>
+                            </tr>
+                            <tr>
+                                <td>备opc登录账户</td>
+                            </tr>
+                            <tr>
+                                <td>备opc登录密码</td>
+                            </tr>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    function opc_show() {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "",
+            data: {
+                'module': module_name
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+
+
+    function get_config() {
+        var module_name = $("#module").val()
+
+        $.ajax({
+            url: "",
+            data: {
+                'module': module_name
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+
+    function success(data) {
+        console.log(data)
+        var $comm = '';
+        for (odc in data.basic_config) {
+            $comm +=
+                '<tr>' +
+                '<td scope="row" class="table-info">' + odc.substring(0) + '</td>' +
+                '<td scope="row" class="table-success">' + data.basic_config[odc] + '</td>' +
+                '</tr>'
+        }
+        var $opc_da_config = $('#opc_da_config');
+        $opc_da_config.html($comm)
+    }
+</script>
+
+</html>

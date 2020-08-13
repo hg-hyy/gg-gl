@@ -1,0 +1,6 @@
+log/
+*.exe
+conf/
+upload/
+.mod
+.sum

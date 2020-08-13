@@ -2,5 +2,5 @@ log/
 *.exe
 conf/
 upload/
-.mod
-.sum
+go.mod
+go.sum

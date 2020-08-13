@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -32,7 +31,7 @@ var personInfo = []PersonInfo{
 // ReadFile json
 func ReadFile() {
 
-	filePtr, err := os.Open("./conf/person_info.json")
+	filePtr, err := os.Open("./conf/d_opcda_client.json")
 	if err != nil {
 		fmt.Printf("Open file failed [Err:%s]", err.Error())
 		return
@@ -119,18 +118,10 @@ func Opcdaget(c *gin.Context) {
 //Opcdapost handle post
 func Opcdapost(c *gin.Context) {
 	var form OpcdaForm
-	if c.ShouldBind(&form) == nil {
 
-		file, err := c.FormFile("file")
-		if err != nil {
+	defer func() {
+		if err := recover(); err != nil {
 			fmt.Println(err)
-		}
-
-		// 上传文件到指定的路径
-		// dst := filepath.Base(`D:\Web\go\src\hello\upload\` + file.Filename)
-		dst := fmt.Sprintf(`./upload/` + file.Filename)
-		if e := c.SaveUploadedFile(file, dst); e != nil {
-			fmt.Println(e)
 		}
 
 		c.HTML(http.StatusOK, "opc_show.html", gin.H{
@@ -139,23 +130,34 @@ func Opcdapost(c *gin.Context) {
 			"opc_config": form,
 		})
 
-		outputFile, err := os.OpenFile("./conf/da.json", os.O_WRONLY|os.O_CREATE, 0666)
-		if err != nil {
-			fmt.Printf("An error occurred with file opening or creation\n")
-			return
-		}
-		defer outputFile.Close()
+	}()
+	if c.ShouldBind(&form) == nil {
 
-		outputWriter := bufio.NewWriter(outputFile)
-		outputString := "hello golang!\n"
-
-		for i := 0; i < 1; i++ {
-			outputWriter.WriteString(outputString)
+		// dst := filepath.Base(`D:\Web\go\src\hello\upload\` + file.Filename)
+		// 上传文件到指定的路径
+		file, _ := c.FormFile("file")
+		dst := fmt.Sprintf(`./upload/` + file.Filename)
+		if e := c.SaveUploadedFile(file, dst); e != nil {
+			fmt.Println(e)
 		}
-		outputWriter.Flush()
-		// WriteExcel()
 		ReadExcel(form)
 	}
+	// outputFile, err := os.OpenFile("./conf/da.json", os.O_WRONLY|os.O_CREATE, 0666)
+	// if err != nil {
+	// 	fmt.Printf("An error occurred with file opening or creation\n")
+	// 	return
+	// }
+	// defer outputFile.Close()
+
+	// outputWriter := bufio.NewWriter(outputFile)
+	// outputString := "hello golang!\n"
+
+	// for i := 0; i < 1; i++ {
+	// 	outputWriter.WriteString(outputString)
+	// }
+	// outputWriter.Flush()
+	// WriteExcel()
+
 }
 
 type tags struct {

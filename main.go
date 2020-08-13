@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"hello/auth"
 	"hello/opc"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -22,52 +24,50 @@ func getUser(c *gin.Context) {
 	c.JSON(http.StatusOK, json)
 }
 
-//LoginForm struct
-type LoginForm struct {
-	Email    string `form:"email" binding:"required"`
-	Password string `form:"password" binding:"required"`
+func index(c *gin.Context) {
+	c.Request.URL.Path = "/index"
+
+	log.Println("welcome to go lang")
 }
 
-func sign(c *gin.Context) {
-	var form LoginForm
-	// in this case proper binding will be automatically selected
-	if c.ShouldBind(&form) == nil {
-
-		if form.Email == "littleshenyun@outlook.com" && form.Password == "111111" {
-			f, _ := c.FormFile("file")
-			log.Println(f.Filename)
-			c.SaveUploadedFile(f, "./upload")
-			c.JSON(200, gin.H{
-				"status":   "you are logged in",
-				"Email":    form.Email,
-				"password": form.Password,
-				"success":  true})
-		} else {
-			c.JSON(401, gin.H{"status": "unauthorized"})
-		}
-	}
+func error404(c *gin.Context) {
+	c.HTML(http.StatusNotFound, "404.html", nil)
 }
-func login(c *gin.Context) {
 
-	Email := c.PostForm("Email")
-	password := c.PostForm("password")
-	json := gin.H{
-		"Email":    Email,
-		"password": password,
-	}
-	c.JSON(http.StatusOK, json)
-}
 func formatAsDate(t time.Time) string {
 	year, month, day := t.Date()
 	return fmt.Sprintf("%d%02d/%02d", year, month, day)
 }
+
+func test(response http.ResponseWriter, request *http.Request) {
+	tmpl, err := template.ParseFiles("base.html", "index.html")
+	if err != nil {
+		fmt.Println("parse index.html failed,err:", err)
+		return
+	}
+	name := "tom"
+	//tmpl.Execute(response,name)
+	tmpl.ExecuteTemplate(response, "index.html", name)
+}
+
 func main() {
 
 	// 禁用控制台颜色
 	gin.DisableConsoleColor()
+	// 日志输出
 	f, _ := os.Create("./log/gin.log")
 	gin.DefaultWriter = io.MultiWriter(f)
+
+	// 默认启动方式，包含 Logger、Recovery 中间件
 	r := gin.Default()
+	// r.Use(gin.Recovery())
+	// r.Use(gin.Logger())
+
+	// 自定义启动
+	// r:=gin.New()
+	// r.Use(handler.Recover)
+
+	http.HandleFunc("/", test)
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	s := &http.Server{
 		Addr:           ":8080",
@@ -80,72 +80,55 @@ func main() {
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
 	}
+
+	//自定义日志格式
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 
-		// 你的自定义格式
 		return fmt.Sprintf(`[%s][%s][%s][%s][%s][%d][%s][%s]`,
-			param.TimeStamp.Format(`2006-01-02 15:04:05`),
-			param.ClientIP,
-			param.Method,
-			param.Path,
+			param.TimeStamp.Format(`2006-01-02 15:04:05`), //请求时间
+			param.ClientIP, //请求ip
+			param.Method,   //请求方法
+			param.Path,     //请求路径
 			param.Request.Proto,
 			param.StatusCode,
 			param.Latency,
 			param.ErrorMessage,
 		)
 	}))
-	r.Use(gin.Recovery())
 
-	v1 := r.Group("/v1")
-	{
-		v1.GET("/login", login)
-	}
-
-	// Simple group: v2
-	v2 := r.Group("/v2")
-	{
-		v2.POST("/sign", sign)
-	}
-
-	// r.Static("/static", "./static")
+	// 静态文件
 	r.Static("/assets", "./assets")
+	// r.Static("/static", "./static")
 	r.StaticFS("/static", http.Dir("./static"))
 	r.StaticFile("/favicon.ico", "./resources/favicon.ico")
-
+	// HTML模板文件
 	r.LoadHTMLGlob("templates/**/*")
 
+	// 路由分组
+	setting := r.Group("/setting")
+	{
+		setting.GET("/profile", auth.Profile)
+	}
+
+	admin := r.Group("/admin")
+	{
+		admin.POST("/sign", auth.Sign)
+		admin.POST("/register", auth.Register)
+	}
+	// 路由
+	r.NoRoute(error404)
+	r.Any("/test", index)
 	r.GET("/user:name", getUser)
 	r.GET("/daget", opc.Opcdaget)
 	r.POST("/dapost", opc.Opcdapost)
-
-	r.POST("/sign", sign)
-
-	r.GET("/", func(c *gin.Context) {
-
-		c.Request.URL.Path = "/index"
-		r.HandleContext(c)
-		// c.JSON(http.StatusOK, gin.H{
-		// 	"message": "hello,golang",
-		// })
-		log.Println("file.Filename")
-	})
-	r.GET("/login", func(c *gin.Context) {
-
-		data := gin.H{
-			"message": "login",
-		}
-
-		c.JSON(http.StatusOK, data)
-
-	})
-
+	r.GET("/", index)
 	r.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", gin.H{
 			"title": "Main website",
 		})
 
 	})
-
+	// cookie
 	r.GET("/cookie", func(c *gin.Context) {
 
 		cookie, err := c.Cookie("gin_cookie")
@@ -157,20 +140,36 @@ func main() {
 
 		fmt.Printf("Cookie value: %s \n", cookie)
 	})
+	// 获取get请求参数
 	r.GET("/welcome", func(c *gin.Context) {
 		firstname := c.DefaultQuery("firstname", "Guest") //如果没有则设置默认值
 		lastname := c.Query("lastname")                   // 是 c.Request.URL.Query().Get("lastname") 的简写
 
 		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
 	})
+	// 获取第三方数据
+	r.GET("/someDataFromReader", func(c *gin.Context) {
+		response, err := http.Get("https://raw.githubusercontent.com/gin-gonic/logo/master/color.png")
+		if err != nil || response.StatusCode != http.StatusOK {
+			c.Status(http.StatusServiceUnavailable)
+			return
+		}
 
+		reader := response.Body
+		contentLength := response.ContentLength
+		contentType := response.Header.Get("Content-Type")
+
+		extraHeaders := map[string]string{
+			"Content-Disposition": `attachment; filename="gopher.png"`,
+		}
+
+		c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+	})
 	// src, des := `C:\Users\littl\Desktop\a.txt`, `D:\b.txt`
-
 	// err := opc.CopyFile(src, des)
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
-
 	//r.Run(":8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 	s.ListenAndServe()
 }

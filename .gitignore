@@ -5,4 +5,4 @@ upload/
 go.mod
 go.sum
 test/
-.db
+model/*.db

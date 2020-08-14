@@ -14,6 +14,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	// import _ "github.com/jinzhu/gorm/dialects/mysql"
+	// import _ "github.com/jinzhu/gorm/dialects/postgres"
+	// import _ "github.com/jinzhu/gorm/dialects/sqlite"
+	// import _ "github.com/jinzhu/gorm/dialects/mssql"
 )
 
 func getUser(c *gin.Context) {
@@ -55,19 +59,25 @@ func test(response http.ResponseWriter, request *http.Request) {
 
 func main() {
 
+	// 模式
+	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	// 禁用控制台颜色
 	gin.DisableConsoleColor()
 	// 日志输出
 	f, _ := os.Create("./log/gin.log")
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(f)
+
 	gin.DefaultWriter = io.MultiWriter(f)
 
 	// 默认启动方式，包含 Logger、Recovery 中间件
-	r := gin.Default()
+	// r := gin.Default()
 	// r.Use(gin.Recovery())
 	// r.Use(gin.Logger())
 
 	// 自定义启动
-	// r:=gin.New()
+	r := gin.New()
 	// r.Use(handler.Recover)
 
 	http.HandleFunc("/", test)
@@ -80,24 +90,24 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
-		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
-	}
+	// gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+	// 	log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
+	// }
 
 	//自定义日志格式
-	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+	// r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 
-		return fmt.Sprintf(`[%s][%s][%s][%s][%s][%d][%s][%s]`,
-			param.TimeStamp.Format(`2006-01-02 15:04:05`), //请求时间
-			param.ClientIP, //请求ip
-			param.Method,   //请求方法
-			param.Path,     //请求路径
-			param.Request.Proto,
-			param.StatusCode,
-			param.Latency,
-			param.ErrorMessage,
-		)
-	}))
+	// 	return fmt.Sprintf("[%s] [%s] [%s] [%d] [%s]\n",
+	// 		param.TimeStamp.Format(`2006-01-02 15:04:05`), //请求时间
+	// 		//param.ClientIP,        //请求ip
+	// 		param.Method, //请求方法
+	// 		param.Path,   //请求路径
+	// 		//param.Request.Proto,   //协议
+	// 		param.StatusCode, //状态码
+	// 		//param.Latency,         //响应时间
+	// 		param.ErrorMessage, //错误信息
+	// 	)
+	// }))
 
 	// 静态文件
 	r.Static("/assets", "./assets")
@@ -115,8 +125,9 @@ func main() {
 
 	admin := r.Group("/admin")
 	{
-		admin.POST("/sign", auth.Sign)
+		admin.POST("/signin", auth.Signin)
 		admin.POST("/register", auth.Register)
+		admin.GET("/signup", auth.Signup)
 	}
 	// 路由
 	r.NoRoute(error404)
@@ -126,7 +137,7 @@ func main() {
 	r.POST("/dapost", opc.Opcdapost)
 	r.GET("/", index)
 	r.GET("/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", gin.H{
+		c.HTML(http.StatusOK, "sign_in.html", gin.H{
 			"title": "Main website",
 		})
 
@@ -174,6 +185,15 @@ func main() {
 	// 	fmt.Println(err)
 	// }
 	//r.Run(":8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-	model.TestDB()
+	r.GET("/db", func(c *gin.Context) {
+
+		model.UserDB()
+		model.TestDB()
+		c.JSON(http.StatusOK, gin.H{
+			"code":    1000,
+			"msg":     "db init  success complete",
+			"success": true,
+		})
+	})
 	s.ListenAndServe()
 }

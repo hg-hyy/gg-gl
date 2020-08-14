@@ -1,17 +1,27 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // Product TEST
 type Product struct {
-	gorm.Model
+	ID    int `gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
 	Code  string
 	Price uint
 }
 
+// User   login user
+type User struct {
+	ID       int `gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
+	Username string
+	Email    string
+	Password string
+}
+
 // TestDB sqlite
 func TestDB() {
-	db, err := gorm.Open("sqlite3", "./model/test.db")
+	db, err := gorm.Open("sqlite3", "./model/hello.sqlite")
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -32,5 +42,24 @@ func TestDB() {
 	db.Model(&product).Update("Price", 2000)
 
 	// Delete - delete product
-	db.Delete(&product)
+	// db.Delete(&product)
+}
+
+// UserDB sqlite
+func UserDB() {
+	db, err := gorm.Open("sqlite3", "./model/hello.sqlite")
+	if err != nil {
+		panic("failed to connect database")
+	}
+	defer db.Close()
+
+	// Migrate the schema
+	db.AutoMigrate(&User{})
+
+	// Read
+	var user User
+	db.First(&user, 1)
+	db.First(&user, "Username = ?", "admin")
+	db.Where("Username = ?", "admin").First(&user)
+
 }

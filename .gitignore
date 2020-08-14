@@ -4,3 +4,4 @@ conf/
 upload/
 go.mod
 go.sum
+test/

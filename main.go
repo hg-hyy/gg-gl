@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"hello/auth"
+	"hello/model"
 	"hello/opc"
 	"html/template"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 func getUser(c *gin.Context) {
@@ -26,6 +28,7 @@ func getUser(c *gin.Context) {
 
 func index(c *gin.Context) {
 	c.Request.URL.Path = "/index"
+	// r.HandleContext(c)
 
 	log.Println("welcome to go lang")
 }
@@ -171,5 +174,6 @@ func main() {
 	// 	fmt.Println(err)
 	// }
 	//r.Run(":8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	model.TestDB()
 	s.ListenAndServe()
 }

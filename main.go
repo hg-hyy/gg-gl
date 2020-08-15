@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"hello/auth"
+	"hello/handler"
 	"hello/model"
 	"hello/opc"
 	"html/template"
@@ -191,9 +192,35 @@ func main() {
 		model.TestDB()
 		c.JSON(http.StatusOK, gin.H{
 			"code":    1000,
-			"msg":     "db init  success complete",
+			"msg":     "db init  successful complete !",
 			"success": true,
 		})
 	})
+	fhh := handler.Persion{
+		Name: "fhh",
+		Age:  32,
+	}
+
+	// in := 123
+	// ft := 3.14
+	// str := "golang"
+	// arry := [...]int{1, 2, 3}
+	// sli := []int{1, 2, 3}
+	// mp := map[string]string{
+	// 	"name": "fhh",
+	// 	"age":  "32",
+	// }
+	// fmt.Println(in, str)
+
+	// handler.Testreflect(&in)
+	// handler.Testreflect(ft)
+	// handler.Testreflect(&str)
+	// handler.Testreflect(arry)
+	// handler.Testreflect(sli)
+	// handler.Testreflect(mp)
+	handler.Testreflect(&fhh)
+	handler.Printreflect()
+	// fmt.Println(in, str)
+	fmt.Println(fhh)
 	s.ListenAndServe()
 }

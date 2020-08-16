@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"hello/auth"
-	"hello/handler"
 	"hello/modbus"
 	"hello/model"
 	"hello/opc"
@@ -231,11 +230,19 @@ func main() {
 	// handler.Testreflect(&fhh)
 	// fmt.Println(in, str)
 	var wg sync.WaitGroup
-	wg.Add(1)
-	// go handler.Chantestprime()
-	wg.Add(1)
+	// wg.Add(1)
 	// go handler.Testlock()
-	go handler.Readandwrite()
+	// go handler.Chantestprime()
+	// go handler.Readandwrite()
+
+	err := os.MkdirAll("./fsh/cherry/secret", 0666)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err1 := os.RemoveAll("./fsh")
+	if err1 != nil {
+		fmt.Println(err1)
+	}
 	s.ListenAndServe()
 	wg.Wait()
 }

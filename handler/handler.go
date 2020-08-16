@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"reflect"
 	"runtime/debug"
+	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -61,6 +63,63 @@ func (p *Persion) Make(name string, age int) {
 	fmt.Println("i am make loud with fsh")
 	p.Name = name
 	p.Age = age
+}
+
+// Employee ...
+type Employee struct {
+	ID   string
+	Name string
+	Age  int
+}
+
+// UpdateAge ...
+func (e *Employee) UpdateAge(newVal int) {
+	e.Age = newVal
+}
+
+// UpdateAge1 ...
+func (e Employee) UpdateAge1(newVal int) {
+	e.Age = newVal
+}
+
+// GetAge ...
+func (e Employee) GetAge() int {
+	return e.Age
+}
+
+// TestMethod ...
+func TestMethod() {
+	e := Employee{"1", "fhh", 10}
+	e.UpdateAge(99)
+	fmt.Println(e.GetAge())
+}
+
+// TestMethod1 ...
+func TestMethod1() {
+	e := Employee{"2", "fsh", 20}
+	e.UpdateAge1(10)
+	fmt.Println(e.GetAge())
+}
+
+// MyStruct ...
+type MyStruct struct {
+	N int
+}
+
+// Printreflect ...
+func Printreflect() {
+
+	n := MyStruct{1}
+
+	// get
+	immutable := reflect.ValueOf(n)
+	val := immutable.FieldByName("N").Int()
+	fmt.Printf("N=%d\n", val) // prints 1
+
+	// set
+	mutable := reflect.ValueOf(&n).Elem()
+	mutable.FieldByName("N").SetInt(7)
+	fmt.Printf("N=%d\n", n.N) // prints 7
 }
 
 // Testreflect ...
@@ -119,8 +178,8 @@ func Testreflect(i interface{}) {
 	// 遍历结构体字段
 	num := t.NumField()
 	for i := 0; i < num; i++ {
-		fmt.Println(t.Field(i).Name)
-		fmt.Println(t.Field(i).Tag.Get("json"))
+		fmt.Println(t.Field(i).Name, t.Field(i).Tag.Get("json"))
+
 	}
 
 	// mt0 := t.Method(0)
@@ -137,42 +196,88 @@ func Testreflect(i interface{}) {
 	param = append(param, reflect.ValueOf(33))
 
 	v.MethodByName("Make").Call(param)
+
 	TestMethod()
 	TestMethod1()
+	Printreflect()
+	goroution()
+	isprime()
+	testchan(ch)
 }
 
-// Employee ...
-type Employee struct {
-	ID   string
-	Name string
-	Age  int
+var wg sync.WaitGroup
+
+func printhello(num int) {
+
+	for i := 0; i < 5; i++ {
+
+		fmt.Printf("协程ID:%v ------ 输出：%v\n", num, i)
+		time.Sleep(time.Second * 1)
+	}
+
+	wg.Done()
 }
 
-// UpdateAge ...
-func (e *Employee) UpdateAge(newVal int) {
-	e.Age = newVal
+func goroution() {
+
+	for i := 1; i <= 2; i++ {
+		wg.Add(1)
+		go printhello(i)
+
+	}
+	wg.Wait()
 }
 
-// UpdateAge1 ...
-func (e Employee) UpdateAge1(newVal int) {
-	e.Age = newVal
+func isprime() {
+	start := time.Now().Unix()
+	for num := 2; num < 100; num++ {
+		flag := true
+		for i := 2; i < num; i++ {
+			if num%i == 0 {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			fmt.Println(num, "是素数")
+		}
+	}
+	end := time.Now().Unix()
+
+	fmt.Println(end-start, "---s")
+
 }
 
-// GetAge ...
-func (e Employee) GetAge() int {
-	return e.Age
+var ch = make(chan int, 10)
+
+func writechan(ch chan int) {
+
+	for i := 0; i < 10; i++ {
+
+		ch <- i
+		time.Sleep(time.Second * 1)
+	}
+	wg.Done()
+
+}
+func readchan(ch chan int) {
+	// for i := 0; i < 10; i++ {
+
+	// 	it := <-ch1
+	// 	fmt.Println(it)
+	// }
+
+	for v := range ch {
+		fmt.Println(v)
+
+	}
+	wg.Done()
 }
 
-// TestMethod ...
-func TestMethod() {
-	e := Employee{"1", "fhh", 10}
-	e.UpdateAge(99)
-	fmt.Println(e.GetAge())
-}
-
-// TestMethod1 ...
-func TestMethod1() {
-	e := Employee{"2", "fsh", 20}
-	e.UpdateAge1(10)
-	fmt.Println(e.GetAge())
+func testchan(ch chan int) {
+	wg.Add(1)
+	go writechan(ch)
+	wg.Add(1)
+	go readchan(ch)
+	wg.Wait()
 }

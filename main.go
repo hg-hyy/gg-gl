@@ -219,7 +219,6 @@ func main() {
 	// handler.Testreflect(sli)
 	// handler.Testreflect(mp)
 	handler.Testreflect(&fhh)
-	handler.Printreflect()
 	// fmt.Println(in, str)
 	fmt.Println(fhh)
 	s.ListenAndServe()

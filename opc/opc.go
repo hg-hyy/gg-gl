@@ -106,60 +106,6 @@ type OpcdaForm struct {
 	BakServerPassword  string `form:"bak_server_password" binding:"required" json:"bak_server_password"`
 }
 
-//Opcdaget return opc da config page
-func Opcdaget(c *gin.Context) {
-
-	c.HTML(http.StatusOK, "da.html", gin.H{
-		"title": "opc da",
-	})
-
-}
-
-//Opcdapost handle post
-func Opcdapost(c *gin.Context) {
-	var form OpcdaForm
-
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println(err)
-		}
-
-		c.HTML(http.StatusOK, "opc_show.html", gin.H{
-			"title":      "opc show",
-			"now":        (time.Now()).Format("2006-01-02 15:04:05"),
-			"opc_config": form,
-		})
-
-	}()
-	if c.ShouldBind(&form) == nil {
-
-		// dst := filepath.Base(`D:\Web\go\src\hello\upload\` + file.Filename)
-		// 上传文件到指定的路径
-		file, _ := c.FormFile("file")
-		dst := fmt.Sprintf(`./upload/` + file.Filename)
-		if e := c.SaveUploadedFile(file, dst); e != nil {
-			fmt.Println(e)
-		}
-		ReadExcel(form)
-	}
-	// outputFile, err := os.OpenFile("./conf/da.json", os.O_WRONLY|os.O_CREATE, 0666)
-	// if err != nil {
-	// 	fmt.Printf("An error occurred with file opening or creation\n")
-	// 	return
-	// }
-	// defer outputFile.Close()
-
-	// outputWriter := bufio.NewWriter(outputFile)
-	// outputString := "hello golang!\n"
-
-	// for i := 0; i < 1; i++ {
-	// 	outputWriter.WriteString(outputString)
-	// }
-	// outputWriter.Flush()
-	// WriteExcel()
-
-}
-
 type tags struct {
 	TagID          int    `json:"tag_id"`
 	PublishTagName string `json:"publish_tag_name"`
@@ -267,4 +213,58 @@ func WriteExcel() {
 	if err := f.SaveAs("./upload/Book1.xlsx"); err != nil {
 		fmt.Println(err)
 	}
+}
+
+//Opcdaget return opc da config page
+func Opcdaget(c *gin.Context) {
+
+	c.HTML(http.StatusOK, "opc_index.html", gin.H{
+		"title": "opc da",
+	})
+
+}
+
+//Opcdapost handle post
+func Opcdapost(c *gin.Context) {
+	var form OpcdaForm
+
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+
+		c.HTML(http.StatusOK, "opc_show.html", gin.H{
+			"title":      "opc show",
+			"now":        (time.Now()).Format("2006-01-02 15:04:05"),
+			"opc_config": form,
+		})
+
+	}()
+	if c.ShouldBind(&form) == nil {
+
+		// dst := filepath.Base(`D:\Web\go\src\hello\upload\` + file.Filename)
+		// 上传文件到指定的路径
+		file, _ := c.FormFile("file")
+		dst := fmt.Sprintf(`./upload/` + file.Filename)
+		if e := c.SaveUploadedFile(file, dst); e != nil {
+			fmt.Println(e)
+		}
+		ReadExcel(form)
+	}
+	// outputFile, err := os.OpenFile("./conf/da.json", os.O_WRONLY|os.O_CREATE, 0666)
+	// if err != nil {
+	// 	fmt.Printf("An error occurred with file opening or creation\n")
+	// 	return
+	// }
+	// defer outputFile.Close()
+
+	// outputWriter := bufio.NewWriter(outputFile)
+	// outputString := "hello golang!\n"
+
+	// for i := 0; i < 1; i++ {
+	// 	outputWriter.WriteString(outputString)
+	// }
+	// outputWriter.Flush()
+	// WriteExcel()
+
 }

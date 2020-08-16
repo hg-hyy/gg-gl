@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hello/auth"
 	"hello/handler"
+	"hello/modbus"
 	"hello/model"
 	"hello/opc"
 	"html/template"
@@ -11,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -130,12 +132,20 @@ func main() {
 		admin.POST("/register", auth.Register)
 		admin.GET("/signup", auth.Signup)
 	}
+	opcda := r.Group("/opc")
+	{
+		opcda.GET("/index", opc.Opcdaget)
+		opcda.POST("/show", opc.Opcdapost)
+	}
+	mbs := r.Group("/modbus")
+	{
+		mbs.GET("/index", modbus.Modbusget)
+		mbs.POST("/show", modbus.Modbuspost)
+	}
 	// 路由
 	r.NoRoute(error404)
 	r.Any("/test", index)
 	r.GET("/user:name", getUser)
-	r.GET("/daget", opc.Opcdaget)
-	r.POST("/dapost", opc.Opcdapost)
 	r.GET("/", index)
 	r.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "sign_in.html", gin.H{
@@ -196,10 +206,10 @@ func main() {
 			"success": true,
 		})
 	})
-	fhh := handler.Persion{
-		Name: "fhh",
-		Age:  32,
-	}
+	// fhh := handler.Persion{
+	// 	Name: "fhh",
+	// 	Age:  32,
+	// }
 
 	// in := 123
 	// ft := 3.14
@@ -218,8 +228,14 @@ func main() {
 	// handler.Testreflect(arry)
 	// handler.Testreflect(sli)
 	// handler.Testreflect(mp)
-	handler.Testreflect(&fhh)
+	// handler.Testreflect(&fhh)
 	// fmt.Println(in, str)
-	fmt.Println(fhh)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	// go handler.Chantestprime()
+	wg.Add(1)
+	// go handler.Testlock()
+	go handler.Readandwrite()
 	s.ListenAndServe()
+	wg.Wait()
 }

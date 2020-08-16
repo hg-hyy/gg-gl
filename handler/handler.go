@@ -201,7 +201,6 @@ func Testreflect(i interface{}) {
 	TestMethod1()
 	Printreflect()
 	goroution()
-	isprime()
 	testchan(ch)
 }
 
@@ -226,26 +225,6 @@ func goroution() {
 
 	}
 	wg.Wait()
-}
-
-func isprime() {
-	start := time.Now().Unix()
-	for num := 2; num < 100; num++ {
-		flag := true
-		for i := 2; i < num; i++ {
-			if num%i == 0 {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			fmt.Println(num, "是素数")
-		}
-	}
-	end := time.Now().Unix()
-
-	fmt.Println(end-start, "---s")
-
 }
 
 var ch = make(chan int, 10)
@@ -279,5 +258,131 @@ func testchan(ch chan int) {
 	go writechan(ch)
 	wg.Add(1)
 	go readchan(ch)
+	wg.Wait()
+}
+
+func putnum(intchan chan int) {
+	for i := 2; i < 100; i++ {
+		intchan <- i
+	}
+	wg.Done()
+}
+
+func isprime(intchan, primechan chan int, flagchan chan bool) {
+	for num := range intchan {
+		flag := true
+		for i := 2; i < num; i++ {
+			if num%i == 0 {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			primechan <- num
+		}
+	}
+
+	flagchan <- true
+	wg.Done()
+}
+
+func printprime(primechan chan int) {
+	for val := range primechan {
+		fmt.Println(val)
+	}
+	wg.Done()
+}
+
+func isdone(flagchan chan bool, primechan chan int) {
+	for i := 0; i < 8; i++ {
+		<-flagchan
+	}
+	close(primechan)
+	wg.Done()
+}
+
+// Chantestprime ...
+func Chantestprime() {
+	start := time.Now().Unix()
+	intchan := make(chan int, 1000)
+	primechan := make(chan int, 1000)
+	flagchan := make(chan bool, 16)
+	wg.Add(1)
+	go putnum(intchan)
+	for i := 0; i < 16; i++ {
+		wg.Add(1)
+		go isprime(intchan, primechan, flagchan)
+	}
+	wg.Add(1)
+	go printprime(primechan)
+	wg.Add(1)
+	go isdone(flagchan, primechan)
+
+	end := time.Now().Unix()
+	fmt.Println(end-start, "---s")
+	wg.Wait()
+}
+
+var count int = 0
+
+var mutex sync.Mutex
+
+var m = make(map[int]int, 0)
+
+func factorial(num int) {
+	mutex.Lock()
+	var sum = 1
+	for i := 1; i <= num; i++ {
+		sum *= i
+	}
+	m[num] = sum
+	fmt.Printf("key=%v value=%v\n", num, sum)
+	time.Sleep(time.Millisecond * 10)
+	mutex.Unlock()
+	wg.Done()
+}
+
+// Testlock ...
+func Testlock() {
+	for i := 1; i <= 40; i++ {
+		wg.Add(1)
+		go factorial(i)
+
+	}
+	wg.Wait()
+}
+
+var rwmutex sync.RWMutex
+
+func read() {
+	rwmutex.RLock()
+
+	fmt.Println("===this is read===")
+	time.Sleep(time.Second * 2)
+	rwmutex.RUnlock()
+
+	wg.Done()
+
+}
+func write() {
+	mutex.Lock()
+	fmt.Println("---this is write---")
+	time.Sleep(time.Second * 2)
+	mutex.Unlock()
+	wg.Done()
+}
+
+//Readandwrite 读写互斥，读并行，写串行
+func Readandwrite() {
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go write()
+	}
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go read()
+	}
 	wg.Wait()
 }

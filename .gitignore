@@ -6,3 +6,4 @@ go.mod
 go.sum
 test/
 model/*.db
+.vscode/

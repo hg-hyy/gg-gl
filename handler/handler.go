@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Recover error handle
+// Recover middleware
 func Recover(c *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -34,6 +34,33 @@ func Recover(c *gin.Context) {
 	//加载完 defer recover，继续后续接口调用
 	c.Next()
 }
+
+//Logger middleware
+func Logger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		t := time.Now()
+
+		// Set example variable
+		c.Set("example", "12345")
+
+		// before request
+
+		c.Next()
+
+		// after request
+		latency := time.Since(t)
+		log.Print(latency)
+
+		// access the status we are sending
+		status := c.Writer.Status()
+		log.Println(status)
+	}
+}
+
+
+
+
+
 
 // recover错误，转string
 func errorToString(r interface{}) string {

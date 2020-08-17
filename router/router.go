@@ -17,21 +17,56 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// MsgFlags ...
+var MsgFlags = map[int]string{
+	1000: "ok",
+	500:  "fail",
+}
+
+// GetMsg get error information based on Code
+func GetMsg(code int) string {
+	msg, ok := MsgFlags[code]
+	if ok {
+		return msg
+	}
+
+	return MsgFlags[500]
+}
+
+// Gin ...
+type Gin struct {
+	C *gin.Context
+}
+
+// Response ...
+type Response struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
+}
+
+// Response setting gin.JSON
+func (g *Gin) Response(httpCode, errCode int, data interface{}) {
+	g.C.JSON(httpCode, Response{
+		Code: errCode,
+		Msg:  GetMsg(errCode),
+		Data: data,
+	})
+	return
+}
+
+// var appG = app.Gin{C: c}
+
 func getUser(c *gin.Context) {
+	var appG = Gin{C: c}
 	id := c.Param("id")
 	name := c.Param("name")
 	json := gin.H{
 		"data": id,
 		"name": name,
 	}
-	c.JSON(http.StatusOK, json)
-}
-
-func index(c *gin.Context) {
-	c.Request.URL.Path = "/index"
-	// r.HandleContext(c)
-
-	logging.Debug("welcome to go lang")
+	// c.JSON(http.StatusOK, json)
+	appG.Response(http.StatusOK, 1000, json)
 }
 
 func error404(c *gin.Context) {
@@ -117,22 +152,21 @@ func GetLuckyUser(c *gin.Context) {
 // InitRouter 初始化路由
 func InitRouter() (r *gin.Engine) {
 	r = gin.New()
+	// 自定义日志格式
+	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 
-	//自定义日志格式
-	// r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-
-	// 	return fmt.Sprintf("[%s] [%s] [%s] [%d] [%s]\n",
-	// 		param.TimeStamp.Format(`2006-01-02 15:04:05`), //请求时间
-	// 		//param.ClientIP,        //请求ip
-	// 		param.Method, //请求方法
-	// 		param.Path,   //请求路径
-	// 		//param.Request.Proto,   //协议
-	// 		param.StatusCode, //状态码
-	// 		//param.Latency,         //响应时间
-	// 		param.ErrorMessage, //错误信息
-	// 	)
-	// }))
-
+		return fmt.Sprintf("[%s] [%s] [%s] [%d] [%s]\n",
+			param.TimeStamp.Format(`2006-01-02 15:04:05`), //请求时间
+			//param.ClientIP,        //请求ip
+			param.Method, //请求方法
+			param.Path,   //请求路径
+			//param.Request.Proto,   //协议
+			param.StatusCode, //状态码
+			//param.Latency,         //响应时间
+			param.ErrorMessage, //错误信息
+		)
+	}))
+	// 默认日志
 	// r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
@@ -177,9 +211,27 @@ func InitRouter() (r *gin.Engine) {
 	}
 	// 路由
 	r.NoRoute(error404)
-	r.Any("/test", index)
+	// Any接受任何请求方法
+	r.Any("/getorpost", func(c *gin.Context) {
+
+		id := c.Query("id")
+		page := c.DefaultQuery("page", "0")
+		name := c.PostForm("name")
+		message := c.PostForm("message")
+		c.JSON(http.StatusOK, gin.H{
+			"id":      id,
+			"page":    page,
+			"name":    name,
+			"message": message,
+		})
+	})
 	r.GET("/users:name", getUser)
-	r.GET("/", index)
+	r.GET("/", func(c *gin.Context) {
+		c.Request.URL.Path = "/index"
+		r.HandleContext(c)
+
+		logging.Debug("welcome to go lang")
+	})
 	r.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "sign_in.html", gin.H{
 			"title": "Main website",
@@ -198,7 +250,7 @@ func InitRouter() (r *gin.Engine) {
 
 		fmt.Printf("Cookie value: %s \n", cookie)
 	})
-	// 获取get请求参数
+	// 获取url参数：welcome?firstname=hg&lastname=hyy
 	r.GET("/welcome", func(c *gin.Context) {
 		firstname := c.DefaultQuery("firstname", "Guest") //如果没有则设置默认值
 		lastname := c.Query("lastname")                   // 是 c.Request.URL.Query().Get("lastname") 的简写
@@ -223,7 +275,7 @@ func InitRouter() (r *gin.Engine) {
 
 		c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
 	})
-
+	// 初始化sqlite
 	r.GET("/db", func(c *gin.Context) {
 
 		model.UserDB()
@@ -237,6 +289,31 @@ func InitRouter() (r *gin.Engine) {
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
+	})
+
+	var secrets = gin.H{
+		"foo":    gin.H{"email": "foo@bar.com", "phone": "123433"},
+		"austin": gin.H{"email": "austin@example.com", "phone": "666"},
+		"lena":   gin.H{"email": "lena@guapa.com", "phone": "523443"},
+	}
+
+	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
+		"foo":    "bar",
+		"austin": "1234",
+		"lena":   "hello2",
+		"manu":   "4321",
+	}))
+
+	// /admin/secrets endpoint
+	// hit "localhost:8080/admin/secrets
+	authorized.GET("/secrets", func(c *gin.Context) {
+		// get user, it was set by the BasicAuth middleware
+		user := c.MustGet(gin.AuthUserKey).(string)
+		if secret, ok := secrets[user]; ok {
+			c.JSON(http.StatusOK, gin.H{"user": user, "secret": secret})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"user": user, "secret": "NO SECRET :("})
+		}
 	})
 	return
 }

@@ -1,4 +1,4 @@
-package jwt
+package handler
 
 import (
 	"net/http"

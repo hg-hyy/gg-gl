@@ -5,5 +5,5 @@ upload/
 go.mod
 go.sum
 test/
-model/*.db
+model/*.sqlite
 .vscode/

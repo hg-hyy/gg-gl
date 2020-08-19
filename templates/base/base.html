@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="FLASK_DEMON">
+    <meta name="author" content="HYY, and Bootstrap contributors">
+    <meta name="generator" content="Config-Studio V1.0">
+    <title>{{.title}}</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script src="/static/js/jquery-3.5.1.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/vue.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+    <script src="/static/js/feather.min.js"></script>
+    <script src="/static/js/alerts.js"></script>
+    <script src="/static/js/jquery.datetimepicker.full.min.js"></script>
+    <script src='//recaptcha.net/recaptcha/api.js'></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/base.css" />
+    <link rel="stylesheet" href="/static/css/jquery.datetimepicker.min.css">
+    <style>
+        #main {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body style="overflow: hidden;">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 顶部标题栏 -->
+            <nav id='appbar' class="appbar navbar navbar-expand-md   sticky-top   " style="background-color: #7952b3;">
+                <a class="navbar-brand" href="javascript:void(0)" onclick="plus()">
+                    <span data-feather="menu" style="width: 20px; height: 20px;color:black;"></span>
+                </a>
+                <a class="navbar-brand col-md-1 col-lg-1 mr-0 px-1 navbar-text" href="index"
+                    style="color: white;">
+                    安全隔离网关
+                </a>
+                <!-- <span data-feather="home" style="width: 24px; height: 24px;color: aliceblue;"></span> -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+
+                        </li>
+                    </ul>
+                    <button class="btn btn-outline-info mr-1" type="button" data-toggle="modal" data-target="#FAQ">
+                        FAQ
+                    </button>
+                    <button class="btn btn-outline-warning mr-1" type="button" data-toggle="modal"
+                        data-target="#loginModal">
+                        SIGN IN
+                    </button>
+                    <div class="dropdown mr-2">
+                        <button class="btn btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          
+                            <a href="admin.profile" class="dropdown-item">Profile</a>
+                            <a href="auth.logout" class="dropdown-item">Logout</a>
+                       
+                            <a href="auth.login" class="dropdown-item">Login</a>
+
+                        </div>
+                    </div>
+                    <form class="form-inline mt-2 mt-md-0">
+                        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                </div>
+            </nav>
+            <!-- 左边导航栏 -->
+            <nav id="sidebar" class="d-md-block bg-light sidebar collapse p-0 ">
+
+                <div class="d-flex justify-content-start bg-dark">
+                    <a href="">
+                        <img src="/static/pic/logo.png" class="img-fluid p-0 m-0"
+                            alt="Responsive image" style="height: 72px;width: 240px;" />
+                    </a>
+                </div>
+
+                <div class="sidebar-sticky " style="background:rgba(129, 104, 104, 0.438);">
+                    <ul id='open' class="nav flex-column ">
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span> config setting</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link  " href="cs.opc">
+                            <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
+                            opc
+                        </a>
+
+
+                        <a class="nav-link  " href="cs.load_opc_se">
+                            <span data-feather="edit" style="width: 24px; height: 24px;color:black;"></span>
+                            server
+                        </a>
+
+
+                        <a class="nav-link  " href="cs.load_opc_da">
+                            <span data-feather="star" style="width: 24px; height: 24px;color:black;"></span>
+                            da
+                        </a>
+
+
+                        <a class="nav-link   " href="cs.load_opc_ae">
+                            <span data-feather="anchor" style="width: 24px; height: 24px;color:black;"></span>
+                            ae
+                        </a>
+
+
+                        <a class="nav-link  " href="cs.load_modbus">
+                            <span data-feather="octagon" style="width: 24px; height: 24px;color:black;"></span>
+                            Modbus
+                        </a>
+
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>config & tag review</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+                                <span data-feather="settings"></span>
+                            </a>
+                        </h6>
+
+                        <a class="nav-link  " href="cs.config_review ">
+                            <span data-feather="cpu" style="width: 24px; height: 24px;color:black;"></span>
+                            Config
+                        </a>
+
+
+                        <a class="nav-link " href="cs.show_sensor ">
+                            <span data-feather="file-text" style="width: 24px; height: 24px;color:black;"></span>
+                            Sensor
+                        </a>
+
+
+                        <a class="nav-link" href="cs.control ">
+                            <span data-feather="layers" style="width: 24px; height: 24px;color:black;"></span>
+                            control
+                        </a>
+
+
+                        <a class="nav-link " href="cs.show_alarm ">
+                            <span data-feather="bell" style="width: 24px; height: 24px;color:black;"></span>
+                            Event
+                        </a>
+
+
+                        <a class="nav-link " href="cs.show_tag_page ">
+                            <span data-feather="tag" style="width: 24px; height: 24px;color:black;"></span>
+                            tag
+                        </a>
+
+
+                        <a class="nav-link " href="mt.show_modbus_page ">
+                            <span data-feather="cast" style="width: 24px; height: 24px;color:black;"></span>
+                            modbus
+                        </a>
+
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>log & faq</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link " href="cs.log ">
+                            <span data-feather="hard-drive" style="width: 24px; height: 24px;color:black;"></span>
+                            Log
+                        </a>
+
+
+
+                        <a class="nav-link" href="faq.show_issue ">
+                            <span data-feather="info" style="width: 24px; height: 24px;color:black;"></span>
+                            Faq
+                        </a>
+
+                    </ul>
+
+                    <ul id='close' class="nav flex-column d-none text-center">
+
+                        <h6 class="sidebar-heading mt-2 text-muted">
+                            <span>setting</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link " href="cs.opc" data-toggle="tooltip"
+                            data-placement="right" title="OPC SETTING">
+                            <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
+                        </a>
+
+
+                        <a class="nav-link" href="cs.load_opc_se"
+                            data-toggle="tooltip" data-placement="right" title="load_opc_se">
+                            <span data-feather="edit" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link " href="cs.load_opc_da"
+                            data-toggle="tooltip" data-placement="right" title="load_opc_da">
+                            <span data-feather="star" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link  " href="cs.load_opc_ae"
+                            data-toggle="tooltip" data-placement="right" title="load_opc_ae">
+                            <span data-feather="anchor" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link  " href="cs.load_modbus" data-toggle="tooltip"
+                            data-placement="right" title="load_modbus">
+                            <span data-feather="octagon" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <h6 class="sidebar-heading mt-2 text-muted">
+                            <span>config</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+                            </a>
+                        </h6>
+
+                        <a class="nav-link " href="cs.config_review "
+                            data-toggle="tooltip" data-placement="right" title="config_review">
+                            <span data-feather="cpu" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link" href="cs.show_sensor " data-toggle="tooltip"
+                            data-placement="right" title="show_sensor">
+                            <span data-feather="file-text" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link" href="cs.control " data-toggle="tooltip"
+                            data-placement="right" title="control">
+                            <span data-feather="layers" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link " href="cs.show_alarm " data-toggle="tooltip"
+                            data-placement="right" title="show_alarm">
+                            <span data-feather="bell" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link " href="cs.show_tag_page " data-toggle="tooltip"
+                            data-placement="right" title="show_tag_page">
+                            <span data-feather="tag" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <a class="nav-link " href="mt.show_modbus_page " data-toggle="tooltip"
+                            data-placement="right" title="show_modbus_page">
+                            <span data-feather="cast" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+                        <h6 class="sidebar-heading mt-2 text-muted">
+                            <span>log</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link " href="cs.log " data-toggle="tooltip"
+                            data-placement="right" title="log">
+                            <span data-feather="hard-drive" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+
+
+                        <a class="nav-link" href="faq.show_issue " data-toggle="tooltip"
+                            data-placement="right" title="show_issue">
+                            <span data-feather="info" style="width: 24px; height: 24px;color:black;"></span>
+
+                        </a>
+
+                    </ul>
+                </div>
+            </nav>
+            <!-- 正文-->
+            <main id="main" class='main'>
+                <!--路由区-->
+                <div class="container-fluid">
+                    <div class="col-12" id='content' style="position: relative; overflow-y: auto; height: 699px;">
+                        {{template "content" .}}
+                    </div>
+                </div>
+                <!-- 全局提示框 -->
+                <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
+                <hr class="border-top border-info" />
+
+                <!--页脚-->
+                <div id='footer' class="row p-0 m-0 ">
+                    <div class="col-12">
+                        <div class="row text-center ">
+                            <div class="col-3 col-md">
+                                <img class="mb-2" src="/static/pic/CL1.jpg" alt="" width="100"
+                                    height="100">
+                            </div>
+                            <div class="col-3 col-md">
+                                <h5>Features</h5>
+                                <ul class="list-unstyled text-small">
+                                    <li><a class="text-muted" href="#">Cool stuff</a></li>
+                                    <li><a class="text-muted" href="#">Another one</a></li>
+
+                                </ul>
+                            </div>
+                            <div class="col-3 col-md">
+                                <h5>Resources</h5>
+                                <ul class="list-unstyled text-small">
+                                    <li><a class="text-muted" href="#">Resource</a></li>
+                                    <li><a class="text-muted" href="#">Resource name</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-3 col-md">
+                                <h5>About</h5>
+                                <ul class="list-unstyled text-small">
+                                    <li><a class="text-muted" href="#">Team</a></li>
+                                    <li><a class="text-muted" href="#">Locations</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex py-2" style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
+                        <div class="mx-auto w-auto">
+                            <span>Copyright © <a href="http://www.youzhan.org">天の使精选</a></span> |
+                            <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Can I help U ?</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" rows="10" placeholder="Do you have some FAQ ?"></textarea>
+                </div>
+
+                <div class="modal-footer ">
+                    <button class="btn btn-primary" type="submit">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--model-登录框-->
+    <div class="modal fade in " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal"
+        data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">请登录~</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form class="form-signin" action="auth.login" method="post">
+
+                        <div class="text-center mb-4">
+                            <img width="72" height="72" class="mb-4" alt=""
+                                src="/static/pic/bootstrap-solid.svg">
+                            <h1 class="h3 mb-3 font-weight-normal">Floating labels</h1>
+                            <p>Build form controls with floating labels via the <code>:placeholder-shown</code>
+                                pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in
+                                    latest Chrome, Safari, and
+                                    Firefox.</a></p>
+                        </div>
+
+                        <div class="form-label-group" style="margin-bottom:1rem">
+                            <input class="form-control form-control-lg" id="username1" autofocus="" required=""
+                                type="text" placeholder="Username" name="username">
+                            <label for="username" style="display: none">Username</label>
+                        </div>
+
+                        <div class="form-label-group" style="margin-bottom:1rem">
+                            <input class="form-control form-control-lg" id="password1" required="" type="password"
+                                placeholder="Password" name="password">
+                            <label for="password" style="display: none">Password</label>
+                        </div>
+
+                        <div class="checkbox mb-3">
+                            <label>
+                                <input type="checkbox" value="remember-me"> Remember me
+                                <a href="auth.login">忘记密码?</a>
+                            </label>
+                        </div>
+                        <input class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">
+                        <input type="hidden" name="next" value="" />
+                    </form>
+                </div>
+                <div class="modal-footer">欢迎登机</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace()
+
+
+        function logout() {
+            $.ajax({
+                url: '',
+                type: 'post',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            })
+        }
+
+        function login() {
+            $.ajax({
+                url: '',
+                type: 'post',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            })
+        }
+        var int = self.setInterval("auto_close()", 3500);
+
+        function clock() {
+            var d = new Date();
+            var t = d.toLocaleTimeString();
+            document.getElementById("clock").value = t;
+        }
+
+        function auto_close() {
+            $(".alert").alert('close');
+        }
+        var flag = 1
+
+        function plus() {
+
+
+            if (flag) {
+                $("#sidebar").css({
+                    "width": '73px',
+                    "transition": "width 0.2s"
+                });
+                $(".main").css({
+                    "width": '1847px',
+                    "left": "73px",
+                    "transition": "width 0.1s"
+                });
+                $(".appbar").css({
+                    "width": '1920px',
+                    "left": "0px",
+                    "transition": "width 0.1s"
+                });
+                flag = 0
+                $("#open").addClass('d-none')
+                $("#close").removeClass('d-none')
+            } else {
+                $("#sidebar").css({
+                    "width": '240px',
+                    "transition": "width 0.2s"
+                });
+                $(".main").css({
+                    "width": '1680px',
+                    "left": "240px",
+                    "transition": "width 0.1s"
+                });
+                $(".appbar").css({
+                    "width": '1680px',
+                    "left": "240px",
+                    "transition": "width 0.1s"
+                });
+                $("#close").addClass('d-none')
+                $("#open").removeClass('d-none')
+                flag = 1
+            }
+
+
+        }
+    </script>
+</body>
+
+</html>

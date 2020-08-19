@@ -9,11 +9,13 @@ import (
 	"hello/opc"
 	"math/rand"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"sync"
 	"text/template"
 	"time"
 
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 )
 
@@ -149,9 +151,33 @@ func GetLuckyUser(c *gin.Context) {
 	}
 }
 
+func loadTemplates(templatesDir string) multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+
+	layouts, err := filepath.Glob(templatesDir + "/layout/*.html")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	includes, err := filepath.Glob(templatesDir + "/views/*.html")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Generate our templates map from our layouts/ and includes/ directories
+	for _, include := range includes {
+		layoutCopy := make([]string, len(layouts))
+		copy(layoutCopy, layouts)
+		files := append(layoutCopy, include)
+		r.AddFromFiles(filepath.Base(include), files...)
+	}
+	return r
+}
+
 // InitRouter 初始化路由
 func InitRouter() (r *gin.Engine) {
 	r = gin.New()
+	// r.HTMLRender = loadTemplates("./templates")
 	// 自定义日志格式
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 

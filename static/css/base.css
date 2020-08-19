@@ -1,0 +1,130 @@
+body {
+  background: #EBEBEB;
+  font: 16px/24px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  color: #333;
+  font-size: .875rem;
+}
+
+/*
+ * Sidebar
+ */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  left: 0;
+  z-index: 100;
+  /* Behind the navbar */
+  padding: 72px 0 0;
+  /* Height of navbar */
+  /* Height of navbar */
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+  overflow: hidden;
+}
+
+.main {
+  position: relative;
+  left: 240px;
+  top: 0px;
+  width: calc(100vw - 240px);
+}
+
+.appbar {
+  left: 240px;
+  top: 0px;
+  height: 72px;
+  width: calc(100vw - 240px);
+
+}
+
+ul>a {
+  font-size: x-large;
+  font-style: italic;
+  font-family: cursive;
+}
+
+@media (max-width: 767.98px) {
+  .main {
+    left: 0px
+  };
+}
+@media (max-width: 767.98px) {
+  .appbar {
+    left: 0px
+  }
+}
+
+/* 
+@media (min-width: 240px) {
+  #close {
+    display: none;
+  }
+} */
+
+/* @media (max-width: 73px) {
+  #close {
+    display: block;
+  }
+} */
+
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 72px);
+  padding-top: .5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Scrollable contents if viewport is shorter than content. */
+}
+
+@supports ((position: -webkit-sticky) or (position: sticky)) {
+  .sidebar-sticky {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+
+.sidebar .nav-link {
+  font-weight: 500;
+  color: #333;
+}
+
+.sidebar .nav-link .feather {
+  margin-right: 4px;
+  color: #999;
+}
+
+
+.sidebar-heading {
+  font-size: .75rem;
+  text-transform: uppercase;
+}
+
+
+.step {
+  width: 940px;
+  margin: 0 auto 24px auto;
+  text-align: center;
+}
+
+ul > a:hover{
+  background-color: darkgrey;
+}
+
+.heading {
+	background: url("../pic/heading.png") repeat-x center center;
+	width: 80%;
+	margin: 0 0 70px 240px;
+}
+.heading span {
+	background: #f7f7f7;
+	padding: 0 30px 0 0;
+	font-size:25px;
+	color: #333;
+	text-transform: uppercase;
+}
+.heading em {
+	font-weight: bold;
+}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"hello/docs"
 	"hello/logging"
 	"hello/router"
 	"hello/setting"
@@ -33,11 +34,24 @@ func Help() {
 	fmt.Println(`B: "-client" load "config.ini" and start as client`)
 	fmt.Println(`C: "for more details please read "README.md"`)
 }
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @termsOfService http://swagger.io/terms/
 func main() {
 
 	// gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 	// 	log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
 	// }
+	docs.SwaggerInfo.Title = "Swagger API"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Description = "This is a config tools server."
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -46,8 +60,10 @@ func main() {
 	}()
 
 	agrs := os.Args
-	if len(agrs) > 0 && agrs[1] == "-h" {
+	if len(agrs) >= 2 && agrs[1] == "-h" {
 		Help()
+	} else {
+		panic("more args is needed")
 	}
 
 	gin.SetMode(setting.ServerSetting.RunMode)

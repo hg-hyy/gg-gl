@@ -215,7 +215,17 @@ func WriteExcel() {
 	}
 }
 
-//Opcdaget return opc da config page
+// Opcdaget godoc
+// @Summary opcda config
+// @Description opcda config
+// @Tags opcda
+// @Accept json
+// @Produce json
+// @Success 200 {integer} string "ok"
+// @Failure 400 {string} string "ok"
+// @Failure 404 {string} string "ok"
+// @Failure 500 {string} string "ok"
+// @Router /opc/index [get]
 func Opcdaget(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "opc_index.html", gin.H{

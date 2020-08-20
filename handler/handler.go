@@ -12,27 +12,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Recover middleware
-func Recover(c *gin.Context) {
-	defer func() {
-		if r := recover(); r != nil {
-			//打印错误堆栈信息
-			log.Printf("panic: %v\n", r)
-			debug.PrintStack()
-			//封装通用json返回
-			//c.JSON(http.StatusOK, Result.Fail(errorToString(r)))
-			//Result.Fail不是本例的重点，因此用下面代码代替
-			c.JSON(http.StatusOK, gin.H{
-				"code": "1",
-				"msg":  errorToString(r),
-				"data": nil,
-			})
-			//终止后续接口调用，不加的话recover到异常后，还会继续执行接口里后续代码
-			c.Abort()
-		}
-	}()
-	//加载完 defer recover，继续后续接口调用
-	c.Next()
+// recover错误，转string
+func errorToString(r interface{}) string {
+	switch v := r.(type) {
+	case error:
+		return v.Error()
+	default:
+		return r.(string)
+	}
+}
+
+//Recover middleware
+func Recover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				//打印错误堆栈信息
+				log.Printf("panic: %v\n", r)
+				debug.PrintStack()
+				c.JSON(http.StatusOK, gin.H{
+					"code": "1",
+					"msg":  errorToString(r),
+					"data": nil,
+				})
+				//终止后续接口调用，不加的话recover到异常后，还会继续执行接口里后续代码
+				c.Abort()
+			}
+		}()
+		//加载完 defer recover，继续后续接口调用
+		c.Next()
+	}
 }
 
 //Logger middleware
@@ -57,18 +66,30 @@ func Logger() gin.HandlerFunc {
 	}
 }
 
+// WhiteList middleware
+func WhiteList() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 定义ip白名单
+		whiteList := []string{
+			"127.0.0.1",
+		}
 
+		ip := c.ClientIP()
 
+		flag := false
 
+		for _, host := range whiteList {
+			if ip == host {
+				flag = true
+				break
+			}
+		}
 
+		if !flag {
+			c.String(http.StatusNetworkAuthenticationRequired, "your ip is not trusted: %s", ip)
+			c.Abort()
+		}
 
-// recover错误，转string
-func errorToString(r interface{}) string {
-	switch v := r.(type) {
-	case error:
-		return v.Error()
-	default:
-		return r.(string)
 	}
 }
 

@@ -3,6 +3,8 @@ package router
 import (
 	"fmt"
 	"hello/auth"
+	"hello/controller"
+	"hello/handler"
 	"hello/logging"
 	"hello/modbus"
 	"hello/model"
@@ -17,6 +19,8 @@ import (
 
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"   // gin-swagger middleware
+	"github.com/swaggo/gin-swagger/swaggerFiles" // swagger embed files
 )
 
 // MsgFlags ...
@@ -151,6 +155,7 @@ func GetLuckyUser(c *gin.Context) {
 	}
 }
 
+// 多模板
 func loadTemplates(templatesDir string) multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
 
@@ -177,7 +182,32 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 // InitRouter 初始化路由
 func InitRouter() (r *gin.Engine) {
 	r = gin.New()
-	// r.HTMLRender = loadTemplates("./templates")
+	c := controller.NewController()
+	v1 := r.Group("/api/v2")
+	{
+		accounts := v1.Group("/accounts")
+		{
+			accounts.GET(":id", c.ShowAccount)
+			accounts.GET("", c.ListAccounts)
+			accounts.POST("", c.AddAccount)
+			accounts.DELETE(":id", c.DeleteAccount)
+			accounts.PATCH(":id", c.UpdateAccount)
+			accounts.POST(":id/images", c.UploadAccountImage)
+		}
+		example := v1.Group("/example")
+		{
+			example.GET("ping", c.PingExample)
+			example.GET("calc", c.CalcExample)
+			example.POST("pathParams", c.PathParamsExample)
+			example.DELETE("header", c.HeaderExample)
+			example.PATCH("securities", c.SecuritiesExample)
+			example.POST("attribute", c.AttributeExample)
+		}
+		//...
+	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// r.HTMLRender = loadTemplates("./templates")  //多模板
 	// 自定义日志格式
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 
@@ -194,7 +224,8 @@ func InitRouter() (r *gin.Engine) {
 	}))
 	// 默认日志
 	// r.Use(gin.Logger())
-	r.Use(gin.Recovery())
+	// r.Use(gin.Recovery())
+	r.Use(handler.Recover())
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	// 静态文件
 	r.Static("/assets", "./assets")

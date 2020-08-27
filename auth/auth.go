@@ -29,7 +29,7 @@ func Signin(c *gin.Context) {
 	// in this case proper binding will be automatically selected
 	if c.ShouldBind(&form) == nil {
 
-		db, err := gorm.Open("sqlite3", "./model/hello.sqlite")
+		db, err := gorm.Open("sqlite3", "./db/hello.sqlite")
 		if err != nil {
 			fmt.Println(err)
 		}

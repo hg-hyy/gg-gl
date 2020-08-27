@@ -7,7 +7,6 @@ import (
 	"hello/router"
 	"hello/setting"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -59,12 +58,12 @@ func main() {
 		}
 	}()
 
-	agrs := os.Args
-	if len(agrs) >= 2 && agrs[1] == "-h" {
-		Help()
-	} else {
-		panic("more args is needed")
-	}
+	// agrs := os.Args
+	// if len(agrs) >= 2 && agrs[1] == "-h" {
+	// 	Help()
+	// } else {
+	// 	panic("more args is needed")
+	// }
 
 	gin.SetMode(setting.ServerSetting.RunMode)
 	routeHandler := router.InitRouter()
@@ -91,4 +90,5 @@ func main() {
 	// wg.Wait()
 
 	server.ListenAndServe()
+
 }

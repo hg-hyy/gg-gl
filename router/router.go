@@ -203,7 +203,7 @@ func InitRouter() (r *gin.Engine) {
 			example.PATCH("securities", c.SecuritiesExample)
 			example.POST("attribute", c.AttributeExample)
 		}
-		//...
+
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

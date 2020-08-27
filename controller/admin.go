@@ -38,4 +38,5 @@ func (c *Controller) Auth(ctx *gin.Context) {
 		Name: "admin",
 	}
 	ctx.JSON(http.StatusOK, admin)
+
 }

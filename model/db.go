@@ -11,12 +11,12 @@ type Product struct {
 	Price uint
 }
 
-// User   login user
+// User   example
 type User struct {
-	ID       int `gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
-	Username string
-	Email    string
-	Password string
+	ID       int    `gorm:"PRIMARY_KEY;AUTO_INCREMENT" json:"id" example:"1"`
+	Username string `json:"Username" example:"fsh"`
+	Email    string `json:"Email" example:"1021509854@qq.com"`
+	Password string `json:"Password" example:"111111"`
 }
 
 // TestDB sqlite

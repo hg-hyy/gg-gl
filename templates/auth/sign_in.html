@@ -10,20 +10,22 @@
 
   <script src="/static/js/jquery-3.5.1.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/wangsrGit119/wangsr-image-bucket/L2Dwidget/js/L2Dwidget.min.js"></script>
 
 </head>
 
 <body>
   <div class="container text-center">
-    <form class="form-signin needs-validation" novalidate action='/admin/signin' method='post' enctype="multipart/form-data">
+    <form class="form-signin needs-validation" novalidate action='/admin/signin' method='post'
+      enctype="multipart/form-data">
       <img class="mb-4" src="/assets/bootstrap-solid.svg" alt="" width="72" height="72">
       <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       <label for="inputEmail" class="sr-only">Email address</label>
-      <input type="email" id="inputEmail" class="form-control " name="email" placeholder="Email" required
-        autofocus autocomplete="off" >
-        <div class="valid-feedback">
-          Looks good!
-        </div>
+      <input type="email" id="inputEmail" class="form-control " name="email" placeholder="Email" required autofocus
+        autocomplete="off">
+      <div class="valid-feedback">
+        Looks good!
+      </div>
       <label for="inputPassword" class="sr-only">Password</label>
       <input type="password" id="inputPassword" class="form-control" name="password" placeholder="Password" required>
       <div class="valid-feedback">
@@ -42,14 +44,14 @@
 </body>
 <script>
   // Example starter JavaScript for disabling form submissions if there are invalid fields
-  (function() {
+  (function () {
     'use strict';
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
       // Fetch all the forms we want to apply custom Bootstrap validation styles to
       var forms = document.getElementsByClassName('needs-validation');
       // Loop over them and prevent submission
-      var validation = Array.prototype.filter.call(forms, function(form) {
-        form.addEventListener('submit', function(event) {
+      var validation = Array.prototype.filter.call(forms, function (form) {
+        form.addEventListener('submit', function (event) {
           if (form.checkValidity() === false) {
             event.preventDefault();
             event.stopPropagation();
@@ -59,5 +61,12 @@
       });
     }, false);
   })();
-  </script>
+
+  L2Dwidget.init({
+    model: {
+      jsonPath: 'https://cdn.jsdelivr.net/gh/wangsrGit119/wangsr-image-bucket/L2Dwidget/live2d-widget-model-miku/assets/miku.model.json',
+    }
+  });
+</script>
+
 </html>

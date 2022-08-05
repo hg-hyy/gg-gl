@@ -22,7 +22,7 @@ func init() {
 	fmt.Println("| Welcome to use Config tools                                      |")
 	fmt.Println("| Code by hyy, latest update at 2020/08/19                         |")
 	fmt.Println("| If you have any problem when using the tool                      |")
-	fmt.Println("| Please submit issue at : https://github.com/shenyunbrother/gg-gl |")
+	fmt.Println("| Please submit issue at : https://github.com/hg-hyy/gg-gl |")
 	fmt.Println("+------------------------------------------------------------------+")
 }
 
